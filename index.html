@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bump Crew</title>
+  <meta name="description" content="Track every baby in your circle: friends, family and coworkers.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍼</text></svg>">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">🍼</span>
+      <div>
+        <h1>Bump Crew</h1>
+        <p class="tagline">Every baby in your circle, in one place</p>
+      </div>
+    </div>
+    <button class="btn primary" id="addBtn" type="button">+ Add a baby</button>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Display options">
+      <div class="control-group">
+        <span class="control-label" id="themeLabel">Size theme</span>
+        <div class="chips" id="themeChips" role="radiogroup" aria-labelledby="themeLabel"></div>
+      </div>
+      <div class="control-row">
+        <div class="tabs" id="filterTabs" role="tablist">
+          <button role="tab" data-filter="all" aria-selected="true">All <span class="count" data-count="all"></span></button>
+          <button role="tab" data-filter="expecting" aria-selected="false">On the way <span class="count" data-count="expecting"></span></button>
+          <button role="tab" data-filter="born" aria-selected="false">Arrived <span class="count" data-count="born"></span></button>
+        </div>
+        <input type="search" id="search" placeholder="Search names…" aria-label="Search babies">
+        <select id="sort" aria-label="Sort by">
+          <option value="due">Due soonest</option>
+          <option value="name">Name A–Z</option>
+          <option value="added">Recently added</option>
+        </select>
+        <div class="seg" role="group" aria-label="Units">
+          <button type="button" data-units="imperial">lb/in</button>
+          <button type="button" data-units="metric">kg/cm</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="grid" class="grid" aria-live="polite"></section>
+
+    <section id="empty" class="empty" hidden>
+      <div class="empty-emoji" aria-hidden="true">👶🤰👶</div>
+      <h2>No babies yet</h2>
+      <p>Add a friend's bump, your sister's newborn, a coworker's little one. There's no limit.</p>
+      <div class="empty-actions">
+        <button class="btn primary" id="emptyAdd" type="button">+ Add a baby</button>
+        <button class="btn" id="sampleBtn" type="button">Load sample babies</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <button class="link" id="exportBtn" type="button">Export backup</button>
+    <label class="link" for="importFile">Import backup</label>
+    <input type="file" id="importFile" accept="application/json" hidden>
+    <span class="muted">Saved on this device only. Sizes are fun averages, not medical advice.</span>
+  </footer>
+
+  <!-- Add / edit form -->
+  <dialog id="formDialog" class="dialog">
+    <form id="babyForm" method="dialog" novalidate>
+      <h2 id="formTitle">Add a baby</h2>
+
+      <label class="field">
+        <span>Parent(s) <em>*</em></span>
+        <input name="parents" required placeholder="e.g. Sam &amp; Jordan" autocomplete="off">
+      </label>
+      <label class="field">
+        <span>Baby's name or nickname</span>
+        <input name="name" placeholder="Optional, e.g. Baby Bean" autocomplete="off">
+      </label>
+      <div class="field-row">
+        <label class="field">
+          <span>Who are they to you?</span>
+          <select name="relation">
+            <option>Friend</option><option>Family</option><option>Coworker</option>
+            <option>Neighbor</option><option>Other</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Size theme</span>
+          <select name="theme"></select>
+        </label>
+      </div>
+
+      <fieldset class="field">
+        <legend>Status</legend>
+        <div class="seg wide" role="radiogroup">
+          <label><input type="radio" name="born" value="no" checked> On the way</label>
+          <label><input type="radio" name="born" value="yes"> Arrived</label>
+        </div>
+      </fieldset>
+
+      <div data-when="expecting">
+        <fieldset class="field">
+          <legend>How do you know the timing?</legend>
+          <div class="seg wide" role="radiogroup">
+            <label><input type="radio" name="dating" value="due" checked> Due date</label>
+            <label><input type="radio" name="dating" value="weeks"> Weeks along</label>
+          </div>
+        </fieldset>
+        <label class="field" data-dating="due">
+          <span>Due date</span>
+          <input type="date" name="dueDate">
+        </label>
+        <div class="field-row" data-dating="weeks" hidden>
+          <label class="field"><span>Weeks</span><input type="number" name="weeks" min="0" max="42" inputmode="numeric"></label>
+          <label class="field"><span>+ Days</span><input type="number" name="days" min="0" max="6" value="0" inputmode="numeric"></label>
+        </div>
+      </div>
+
+      <div data-when="born" hidden>
+        <div class="field-row">
+          <label class="field"><span>Birthday</span><input type="date" name="birthDate"></label>
+          <label class="field"><span>Birth weight</span><input name="birthWeight" placeholder="e.g. 7 lb 4 oz"></label>
+        </div>
+      </div>
+
+      <label class="field">
+        <span>Notes</span>
+        <textarea name="notes" rows="2" placeholder="Gift ideas, shower date, gender reveal…"></textarea>
+      </label>
+
+      <p class="form-error" id="formError" role="alert"></p>
+      <div class="dialog-actions">
+        <button class="btn" type="button" data-close>Cancel</button>
+        <button class="btn primary" type="submit">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Detail view -->
+  <dialog id="detailDialog" class="dialog wide-dialog">
+    <div id="detailBody"></div>
+  </dialog>
+
+  <script src="js/data.js"></script>
+  <script src="js/calc.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
