@@ -18,6 +18,10 @@ A baby tracker for **everyone else's** babies. Most pregnancy apps follow one ba
 - Export/import a JSON backup; data otherwise stays in your browser (localStorage)
 - Light and dark mode, works on phones
 
+## Live site
+
+https://prestonthomas-cmd.github.io/babyTracker/ (served by GitHub Pages from the root of `main`).
+
 ## Running it
 
 No build step. Open `index.html` in a browser, or serve the folder:
